@@ -16,5 +16,35 @@ db.init_app(app)
 
 # add views here 
 
+@app.route('/')
+def index():
+    response = make_response('<h1>Welcome to the pet directory!',200)
+    return response
+
+@app.route('/pets/<int:id>')
+def pet_by_id(id):
+    if pet:= Pet.query.filter_by(id=id).first():
+        response_body = f'<p>Name: {pet.name}</p>\n<p>Species:{pet.species}</p>'
+        response_status = 200
+    else:
+        response_body = f'<p>Pet {id} not found</p>'
+        response_status = 404
+    response = make_response(response_body, response_status)
+    return response
+
+@app.route('/species/<string:species>')
+def pet_by_species(species):
+    if pets := Pet.query.filter_by(species=species).all():
+        size = len(pets)
+        response_body = f'<h2>There are {size} {species}(s)</h2>'
+        for pet in pets:
+            response_body += f'<p>{pet.name}</p>'
+        repsonse_status=200
+    else:
+        response_body = f'<p>Species {species} not found</p>'
+        repsonse_status=404
+    response = make_response(response_body, repsonse_status)
+    return response
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
